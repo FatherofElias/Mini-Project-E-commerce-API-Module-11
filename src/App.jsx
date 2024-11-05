@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import CustomerList from './components/Customer/CustomerList';
 import CustomerForm from './components/Customer/CustomerForm';
 import CustomerDetails from './components/Customer/CustomerDetails';
@@ -13,7 +14,6 @@ import RestockProducts from './components/Product/RestockProducts';
 import PlaceOrderForm from './components/Order/PlaceOrderForm';
 import OrderHistory from './components/Order/OrderHistory';
 import OrderList from './components/Order/OrderList';
-import OrderTotalPrice from './components/Order/OrderTotalPrice';
 import axios from 'axios';
 import './App.css';
 
@@ -60,7 +60,7 @@ class App extends Component {
 
     handleDeleteProduct = (productId) => {
         this.handleModalOpen('Are you sure you want to delete this product?', () => {
-            axios.delete(`http://127.0.0.1:5000/products/${productId}`)
+            axios.delete(`/products/${productId}`)
                 .then(response => {
                     console.log('Product deleted:', response.data);
                     this.setState({ selectedProductId: null });
@@ -71,7 +71,6 @@ class App extends Component {
 
     handleCustomerAdded = () => {
         console.log('Customer added');
-       
     };
 
     render() {
@@ -79,41 +78,61 @@ class App extends Component {
         console.log('Rendering App component');
 
         return (
-            <div className="app-container">
-                <h1>Customer and Product Management</h1>
-                <CustomerForm onCustomerAdded={this.handleCustomerAdded} />
-                <CustomerList onCustomerSelect={this.handleCustomerSelect} />
-                {selectedCustomerId && (
-                    <>
-                        <CustomerDetails customerId={selectedCustomerId} />
-                        <UpdateCustomerForm customerId={selectedCustomerId} />
-                        <OrderList customerId={selectedCustomerId} onOrderSelect={this.handleProductSelect} />
-                    </>
-                )}
-
-                <AddProduct />
-                <ListProducts />
-                {selectedProductId && (
-                    <>
-                        <ProductDetails productId={selectedProductId} onDelete={this.handleDeleteProduct} />
-                        <UpdateProduct productId={selectedProductId} />
-                    </>
-                )}
-
-                <ManageStock />
-                <RestockProducts />
-                <PlaceOrderForm onOrderPlaced={() => console.log('Order placed')} />
-                {selectedCustomerId && <OrderHistory customerId={selectedCustomerId} />}
-                {selectedCustomerId && <OrderTotalPrice customerId={selectedCustomerId} />}
-
-                {showModal && (
-                    <ConfirmationModal
-                        message={modalMessage}
-                        onConfirm={this.handleModalConfirm}
-                        onCancel={this.handleModalClose}
-                    />
-                )}
-            </div>
+            <Router>
+                <div className="app-container">
+                    <nav>
+                        <ul>
+                            <li><Link to="/">Home</Link></li>
+                            <li><Link to="/customers">Customers</Link></li>
+                            <li><Link to="/products">Products</Link></li>
+                            <li><Link to="/orders">Orders</Link></li>
+                        </ul>
+                    </nav>
+                    <Routes>
+                        <Route path="/" element={<h1>Welcome to the E-Commerce App</h1>} />
+                        <Route path="/customers" element={
+                            <>
+                                <CustomerForm onCustomerAdded={this.handleCustomerAdded} />
+                                <CustomerList onCustomerSelect={this.handleCustomerSelect} />
+                                {selectedCustomerId && (
+                                    <>
+                                        <CustomerDetails customerId={selectedCustomerId} />
+                                        <UpdateCustomerForm customerId={selectedCustomerId} />
+                                        <OrderList customerId={selectedCustomerId} onOrderSelect={this.handleProductSelect} />
+                                    </>
+                                )}
+                            </>
+                        } />
+                        <Route path="/products" element={
+                            <>
+                                <AddProduct />
+                                <ListProducts />
+                                {selectedProductId && (
+                                    <>
+                                        <ProductDetails productId={selectedProductId} onDelete={this.handleDeleteProduct} />
+                                        <UpdateProduct productId={selectedProductId} />
+                                    </>
+                                )}
+                                <ManageStock />
+                                <RestockProducts />
+                            </>
+                        } />
+                        <Route path="/orders" element={
+                            <>
+                                <PlaceOrderForm onOrderPlaced={() => console.log('Order placed')} />
+                                {selectedCustomerId && <OrderHistory customerId={selectedCustomerId} />}
+                            </>
+                        } />
+                    </Routes>
+                    {showModal && (
+                        <ConfirmationModal
+                            message={modalMessage}
+                            onConfirm={this.handleModalConfirm}
+                            onCancel={this.handleModalClose}
+                        />
+                    )}
+                </div>
+            </Router>
         );
     }
 }

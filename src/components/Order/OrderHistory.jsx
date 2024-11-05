@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import OrderTotalPrice from './OrderTotalPrice';
 
 const OrderHistory = ({ customerId }) => {
     const [orders, setOrders] = useState([]);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
 
     useEffect(() => {
         if (customerId) {
@@ -12,19 +14,9 @@ const OrderHistory = ({ customerId }) => {
         }
     }, [customerId]);
 
-
-
-const handleCancel = (orderId) => {
-    axios.put(`http://127.0.0.1:5000/orders/${orderId}/cancel`)
-        .then(response => {
-            console.log('Order canceled:', response.data);
-            setOrders(orders.map(order =>
-                order.id === orderId ? { ...order, status: 'canceled' } : order
-            ));
-        })
-        .catch(error => console.error('Error canceling order:', error));
-};
-
+    const handleOrderSelect = (orderId) => {
+        setSelectedOrderId(orderId);
+    };
 
     return (
         <div>
@@ -35,10 +27,11 @@ const handleCancel = (orderId) => {
                         <p>Order ID: {order.id}</p>
                         <p>Date: {order.date}</p>
                         <p>Products: {order.products.map(product => product.name).join(', ')}</p>
+                        <button onClick={() => handleOrderSelect(order.id)}>View Total Price</button>
                     </li>
                 ))}
             </ul>
-            <button onClick={() => handleCancel(order.id)}>Cancel Order</button>
+            {selectedOrderId && <OrderTotalPrice orderId={selectedOrderId} />}
         </div>
     );
 };
