@@ -7,6 +7,7 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
     const [date, setDate] = useState('');
     const [customers, setCustomers] = useState([]);
     const [products, setProducts] = useState([]);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         axios.get('http://127.0.0.1:5000/customers')
@@ -18,17 +19,31 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
             .catch(error => console.error('Error fetching products:', error));
     }, []);
 
+    const validate = () => {
+        const newErrors = {};
+        if (!customerId) newErrors.customerId = 'Customer is required';
+        if (productIds.length === 0) newErrors.productIds = 'At least one product must be selected';
+        if (!date) newErrors.date = 'Date is required';
+        return newErrors;
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post('http://127.0.0.1:5000/orders', { customer_id: customerId, product_ids: productIds, date })
-            .then(response => {
-                console.log('Order placed:', response.data);
-                onOrderPlaced();
-                setCustomerId('');
-                setProductIds([]);
-                setDate('');
-            })
-            .catch(error => console.error('Error placing order:', error));
+        const newErrors = validate();
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+        } else {
+            axios.post('http://127.0.0.1:5000/orders', { customer_id: customerId, product_ids: productIds, date })
+                .then(response => {
+                    console.log('Order placed:', response.data);
+                    onOrderPlaced();
+                    setCustomerId('');
+                    setProductIds([]);
+                    setDate('');
+                    setErrors({});
+                })
+                .catch(error => console.error('Error placing order:', error));
+        }
     };
 
     return (
@@ -41,6 +56,7 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
                         <option key={customer.id} value={customer.id}>{customer.name}</option>
                     ))}
                 </select>
+                {errors.customerId && <span>{errors.customerId}</span>}
             </div>
             <div>
                 <label>Products:</label>
@@ -49,10 +65,12 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
                         <option key={product.id} value={product.id}>{product.name}</option>
                     ))}
                 </select>
+                {errors.productIds && <span>{errors.productIds}</span>}
             </div>
             <div>
                 <label>Date:</label>
                 <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                {errors.date && <span>{errors.date}</span>}
             </div>
             <button type="submit">Place Order</button>
         </form>

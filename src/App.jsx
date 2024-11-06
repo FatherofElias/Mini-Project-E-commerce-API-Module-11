@@ -14,8 +14,10 @@ import RestockProducts from './components/Product/RestockProducts';
 import PlaceOrderForm from './components/Order/PlaceOrderForm';
 import OrderHistory from './components/Order/OrderHistory';
 import OrderList from './components/Order/OrderList';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import './App.css';
+
 
 class App extends Component {
     constructor(props) {
