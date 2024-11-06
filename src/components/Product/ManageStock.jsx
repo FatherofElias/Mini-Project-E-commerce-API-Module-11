@@ -1,39 +1,47 @@
 import React, { useEffect, useState } from 'react';
+import { Table, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const ManageStock = () => {
-  const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [errors, setErrors] = useState('');
 
-  useEffect(() => {
-    axios.get('http://127.0.0.1:5000/products')
-      .then(response => setProducts(response.data))
-      .catch(error => console.error('Error fetching products:', error));
-  }, []);
+    useEffect(() => {
+        axios.get('http://127.0.0.1:5000/products')
+            .then(response => setProducts(response.data))
+            .catch(error => setErrors('Error fetching products:', error));
+    }, []);
 
-  const updateStock = (productId, newStock) => {
-    axios.put(`http://127.0.0.1:5000/products/${productId}/stock`, { stock: newStock })
-      .then(response => {
-        setProducts(products.map(product =>
-          product.id === productId ? { ...product, stock: newStock } : product
-        ));
-      })
-      .catch(error => console.error('Error updating stock:', error));
-  };
+    const handleRestock = (productId) => {
+        // Logic for restocking a product
+    };
 
-  return (
-    <div>
-      <h1>Manage Stock Levels</h1>
-      <ul>
-        {products.map(product => (
-          <li key={product.id}>
-            {product.name} - Stock: {product.stock}
-            <button onClick={() => updateStock(product.id, product.stock + 1)}>Increase</button>
-            <button onClick={() => updateStock(product.id, product.stock - 1)}>Decrease</button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+    if (errors) {
+        return <div>{errors}</div>;
+    }
+
+    return (
+        <Table striped bordered hover>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {products.map(product => (
+                    <tr key={product.id}>
+                        <td>{product.name}</td>
+                        <td>{product.stock}</td>
+                        <td>
+                            <Button variant="primary" onClick={() => handleRestock(product.id)}>Restock</Button>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </Table>
+    );
 };
 
 export default ManageStock;

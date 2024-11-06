@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { ListGroup } from 'react-bootstrap';
 import axios from 'axios';
 
 const ListProducts = () => {
@@ -11,16 +12,13 @@ const ListProducts = () => {
     }, []);
 
     return (
-        <div>
-            <h3>Product List</h3>
-            <ul>
-                {products.map(product => (
-                    <li key={product.id}>
-                        {product.name} - ${product.price}
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <ListGroup>
+            {products.map(product => (
+                <ListGroup.Item key={product.id}>
+                    {product.name} - ${product.price}
+                </ListGroup.Item>
+            ))}
+        </ListGroup>
     );
 };
 

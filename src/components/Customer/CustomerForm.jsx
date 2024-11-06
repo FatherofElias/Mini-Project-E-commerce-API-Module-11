@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
 const CustomerForm = ({ onCustomerAdded }) => {
@@ -6,6 +7,7 @@ const CustomerForm = ({ onCustomerAdded }) => {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [errors, setErrors] = useState({});
+    const [success, setSuccess] = useState('');
 
     const validate = () => {
         const newErrors = {};
@@ -29,6 +31,7 @@ const CustomerForm = ({ onCustomerAdded }) => {
                     setEmail('');
                     setPhone('');
                     setErrors({});
+                    setSuccess('Customer added successfully!');
                 })
                 .catch(error => {
                     console.error('Error adding customer:', error);
@@ -37,24 +40,48 @@ const CustomerForm = ({ onCustomerAdded }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Name:</label>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-                {errors.name && <span>{errors.name}</span>}
-            </div>
-            <div>
-                <label>Email:</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                {errors.email && <span>{errors.email}</span>}
-            </div>
-            <div>
-                <label>Phone:</label>
-                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                {errors.phone && <span>{errors.phone}</span>}
-            </div>
-            <button type="submit">Add Customer</button>
-        </form>
+        <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="name">
+                <Form.Label>Name</Form.Label>
+                <Form.Control 
+                    type="text" 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    isInvalid={!!errors.name} 
+                />
+                <Form.Control.Feedback type="invalid">
+                    {errors.name}
+                </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group controlId="email" className="mt-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control 
+                    type="email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    isInvalid={!!errors.email} 
+                />
+                <Form.Control.Feedback type="invalid">
+                    {errors.email}
+                </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group controlId="phone" className="mt-3">
+                <Form.Label>Phone</Form.Label>
+                <Form.Control 
+                    type="tel" 
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)} 
+                    isInvalid={!!errors.phone} 
+                />
+                <Form.Control.Feedback type="invalid">
+                    {errors.phone}
+                </Form.Control.Feedback>
+            </Form.Group>
+            <Button variant="primary" type="submit" className="mt-3">
+                Add Customer
+            </Button>
+            {success && <Alert variant="success" className="mt-3">{success}</Alert>}
+        </Form>
     );
 };
 

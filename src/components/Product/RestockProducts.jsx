@@ -1,42 +1,55 @@
 import React, { useEffect, useState } from 'react';
+import { Table, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
-const RestockProducts = ({ threshold }) => {
-  const [products, setProducts] = useState([]);
+const RestockProducts = () => {
+    const [products, setProducts] = useState([]);
+    const [errors, setErrors] = useState('');
+    const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    axios.get('http://127.0.0.1:5000/products')
-      .then(response => setProducts(response.data))
-      .catch(error => console.error('Error fetching products:', error));
-  }, []);
+    useEffect(() => {
+        axios.get('http://127.0.0.1:5000/products')
+            .then(response => setProducts(response.data))
+            .catch(error => setErrors('Error fetching products:', error));
+    }, []);
 
-  useEffect(() => {
-    products.forEach(product => {
-      if (product.stock < threshold) {
-        console.log(`Restocking ${product.name}`);
-        axios.put(`http://127.0.0.1:5000/products/${product.id}/stock`, { stock: threshold })
-          .then(response => {
-            setProducts(products.map(p =>
-              p.id === product.id ? { ...p, stock: threshold } : p
-            ));
-          })
-          .catch(error => console.error('Error restocking product:', error));
-      }
-    });
-  }, [products, threshold]);
+    const handleRestock = (productId) => {
+        axios.post(`http://127.0.0.1:5000/products/${productId}/restock`)
+            .then(response => {
+                setSuccess('Product restocked successfully!');
+                setProducts(products.map(product => 
+                    product.id === productId ? { ...product, stock: response.data.stock } : product
+                ));
+            })
+            .catch(error => setErrors('Error restocking product:', error));
+    };
 
-  return (
-    <div>
-      <h1>Restock Products</h1>
-      <ul>
-        {products.map(product => (
-          <li key={product.id}>
-            {product.name} - Stock: {product.stock}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+    return (
+        <>
+            {errors && <Alert variant="danger">{errors}</Alert>}
+            {success && <Alert variant="success">{success}</Alert>}
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {products.map(product => (
+                        <tr key={product.id}>
+                            <td>{product.name}</td>
+                            <td>{product.stock}</td>
+                            <td>
+                                <Button variant="primary" onClick={() => handleRestock(product.id)}>Restock</Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
+        </>
+    );
 };
 
 export default RestockProducts;

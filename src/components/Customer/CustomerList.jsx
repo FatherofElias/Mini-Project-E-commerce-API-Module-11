@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { ListGroup } from 'react-bootstrap';
 import axios from 'axios';
 
 class CustomerList extends Component {
@@ -29,16 +30,13 @@ class CustomerList extends Component {
         const { customers } = this.state;
 
         return (
-            <div className='customer-list'>
-                <h3>Customers</h3>
-                <ul>
-                    {customers.map(customer => (
-                        <li key={customer.id} onClick={() => this.selectCustomer(customer.id)}>
-                            {customer.name}
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            <ListGroup>
+                {customers.map(customer => (
+                    <ListGroup.Item key={customer.id} onClick={() => this.selectCustomer(customer.id)}>
+                        {customer.name}
+                    </ListGroup.Item>
+                ))}
+            </ListGroup>
         );
     }
 }

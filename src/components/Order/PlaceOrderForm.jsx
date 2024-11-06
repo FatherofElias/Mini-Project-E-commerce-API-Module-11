@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
 const PlaceOrderForm = ({ onOrderPlaced }) => {
@@ -8,6 +9,7 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
     const [customers, setCustomers] = useState([]);
     const [products, setProducts] = useState([]);
     const [errors, setErrors] = useState({});
+    const [success, setSuccess] = useState('');
 
     useEffect(() => {
         axios.get('http://127.0.0.1:5000/customers')
@@ -41,39 +43,67 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
                     setProductIds([]);
                     setDate('');
                     setErrors({});
+                    setSuccess('Order placed successfully!');
                 })
-                .catch(error => console.error('Error placing order:', error));
+                .catch(error => {
+                    console.error('Error placing order:', error);
+                });
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Customer:</label>
-                <select value={customerId} onChange={(e) => setCustomerId(e.target.value)}>
+        <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="customer">
+                <Form.Label>Customer</Form.Label>
+                <Form.Control
+                    as="select"
+                    value={customerId}
+                    onChange={(e) => setCustomerId(e.target.value)}
+                    isInvalid={!!errors.customerId}
+                >
                     <option value="">Select Customer</option>
                     {customers.map(customer => (
                         <option key={customer.id} value={customer.id}>{customer.name}</option>
                     ))}
-                </select>
-                {errors.customerId && <span>{errors.customerId}</span>}
-            </div>
-            <div>
-                <label>Products:</label>
-                <select multiple value={productIds} onChange={(e) => setProductIds([...e.target.selectedOptions].map(option => option.value))}>
+                </Form.Control>
+                <Form.Control.Feedback type="invalid">
+                    {errors.customerId}
+                </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group controlId="products" className="mt-3">
+                <Form.Label>Products</Form.Label>
+                <Form.Control
+                    as="select"
+                    multiple
+                    value={productIds}
+                    onChange={(e) => setProductIds([...e.target.selectedOptions].map(option => option.value))}
+                    isInvalid={!!errors.productIds}
+                >
                     {products.map(product => (
                         <option key={product.id} value={product.id}>{product.name}</option>
                     ))}
-                </select>
-                {errors.productIds && <span>{errors.productIds}</span>}
-            </div>
-            <div>
-                <label>Date:</label>
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-                {errors.date && <span>{errors.date}</span>}
-            </div>
-            <button type="submit">Place Order</button>
-        </form>
+                </Form.Control>
+                <Form.Control.Feedback type="invalid">
+                    {errors.productIds}
+                </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group controlId="date" className="mt-3">
+                <Form.Label>Date</Form.Label>
+                <Form.Control
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    isInvalid={!!errors.date}
+                />
+                <Form.Control.Feedback type="invalid">
+                    {errors.date}
+                </Form.Control.Feedback>
+            </Form.Group>
+            <Button variant="primary" type="submit" className="mt-3">
+                Place Order
+            </Button>
+            {success && <Alert variant="success" className="mt-3">{success}</Alert>}
+        </Form>
     );
 };
 

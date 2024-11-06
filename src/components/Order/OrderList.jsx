@@ -1,39 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { func, number } from 'prop-types';
+import React, { useEffect, useState } from 'react';
+import { ListGroup, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
 const OrderList = ({ customerId, onOrderSelect }) => {
     const [orders, setOrders] = useState([]);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         if (customerId) {
             axios.get(`http://127.0.0.1:5000/customers/${customerId}/orders`)
-                .then(response => {
-                    setOrders(response.data);
-                })
+                .then(response => setOrders(response.data))
                 .catch(error => {
-                    console.error('There was an error fetching the orders!', error);
+                    console.error('Error fetching orders:', error);
+                    setError('Failed to fetch orders.');
                 });
         }
     }, [customerId]);
 
     return (
-        <div className="order-list">
+        <div>
             <h3>Orders</h3>
-            <ul>
+            {error && <Alert variant="danger">{error}</Alert>}
+            <ListGroup>
                 {orders.map(order => (
-                    <li key={order.id} onClick={() => onOrderSelect(order.id)}>
-                        Order ID: {order.id}, Date: {order.date}
-                    </li>
+                    <ListGroup.Item key={order.id}>
+                        <p>Order ID: {order.id}</p>
+                        <p>Date: {order.date}</p>
+                        <p>Products: {order.products.map(product => product.name).join(', ')}</p>
+                        <Button variant="primary" onClick={() => onOrderSelect(order.id)}>Select Order</Button>
+                    </ListGroup.Item>
                 ))}
-            </ul>
+            </ListGroup>
         </div>
     );
 };
-
-OrderList.propTypes = {
-    customerId: number.isRequired,
-    onOrderSelect: func.isRequired
-}
 
 export default OrderList;

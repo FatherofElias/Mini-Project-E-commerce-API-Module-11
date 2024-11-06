@@ -62,7 +62,7 @@ class App extends Component {
 
     handleDeleteProduct = (productId) => {
         this.handleModalOpen('Are you sure you want to delete this product?', () => {
-            axios.delete(`/products/${productId}`)
+            axios.delete(`http://127.0.0.1:5000/products/${productId}`)
                 .then(response => {
                     console.log('Product deleted:', response.data);
                     this.setState({ selectedProductId: null });

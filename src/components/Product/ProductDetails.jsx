@@ -1,31 +1,28 @@
 import React, { useEffect, useState } from 'react';
+import { Card, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const ProductDetails = ({ productId, onDelete }) => {
-  const [product, setProduct] = useState(null);
+    const [product, setProduct] = useState(null);
 
-  useEffect(() => {
-    axios.get(`http://127.0.0.1:5000/products/${productId}`)
-      .then(response => setProduct(response.data))
-      .catch(error => console.error('Error fetching product details:', error));
-  }, [productId]);
+    useEffect(() => {
+        axios.get(`http://127.0.0.1:5000/products/${productId}`)
+            .then(response => setProduct(response.data))
+            .catch(error => console.error('Error fetching product details:', error));
+    }, [productId]);
 
-  if (!product) {
-    return <div>Loading...</div>;
-  }
+    if (!product) return <div>Loading...</div>;
 
-  const handleDelete = () => {
-    onDelete(productId);
-  };
-
-  return (
-    <div>
-      <h1>{product.name}</h1>
-      <p>Price: ${product.price}</p>
-      <p>Stock: {product.stock}</p>
-      <button onClick={handleDelete}>Delete Product</button>
-    </div>
-  );
+    return (
+        <Card>
+            <Card.Body>
+                <Card.Title>{product.name}</Card.Title>
+                <Card.Text>Price: ${product.price}</Card.Text>
+                <Card.Text>Stock: {product.stock}</Card.Text>
+                <Button variant="danger" onClick={() => onDelete(product.id)}>Delete Product</Button>
+            </Card.Body>
+        </Card>
+    );
 };
 
 export default ProductDetails;
