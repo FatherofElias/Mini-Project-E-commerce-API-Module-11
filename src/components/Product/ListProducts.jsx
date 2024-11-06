@@ -1,21 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { ListGroup } from 'react-bootstrap';
-import axios from 'axios';
+import React from 'react';
+import { ListGroup, Button, Badge } from 'react-bootstrap';
 
-const ListProducts = () => {
-    const [products, setProducts] = useState([]);
-
-    useEffect(() => {
-        axios.get('http://127.0.0.1:5000/products')
-            .then(response => setProducts(response.data))
-            .catch(error => console.error('Error fetching products:', error));
-    }, []);
-
+const ListProducts = ({ products, onDeleteProduct, onRestockProduct }) => {
     return (
         <ListGroup>
             {products.map(product => (
                 <ListGroup.Item key={product.id}>
-                    {product.name} - ${product.price}
+                    <div>
+                        <p>Product Name: {product.name}</p>
+                        <p>Price: ${product.price}</p>
+                        <p>Stock: <Badge bg="info">{product.stock}</Badge></p>
+                    </div>
+                    <Button variant="danger" onClick={() => onDeleteProduct(product.id)} className="me-2">Delete</Button>
+                    <Button variant="warning" onClick={() => onRestockProduct(product.id)}>Restock</Button>
                 </ListGroup.Item>
             ))}
         </ListGroup>

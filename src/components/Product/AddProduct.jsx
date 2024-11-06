@@ -26,7 +26,7 @@ const AddProduct = ({ onProductAdded }) => {
             axios.post('http://127.0.0.1:5000/products', { name, price, stock })
                 .then(response => {
                     console.log('Product added:', response.data);
-                    onProductAdded();
+                    onProductAdded();  // Invoke the callback
                     setName('');
                     setPrice('');
                     setStock(0);
@@ -35,6 +35,7 @@ const AddProduct = ({ onProductAdded }) => {
                 })
                 .catch(error => {
                     console.error('Error adding product:', error);
+                    setSuccess('');
                 });
         }
     };
