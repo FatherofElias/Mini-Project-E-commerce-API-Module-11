@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
+import ConfirmationModal from './ConfirmationModal'; // Import the modal component
 
 const PlaceOrderForm = ({ onOrderPlaced }) => {
     const [customerId, setCustomerId] = useState('');
@@ -10,6 +11,7 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
     const [products, setProducts] = useState([]);
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState('');
+    const [showModal, setShowModal] = useState(false); // State to manage modal visibility
 
     useEffect(() => {
         axios.get('http://127.0.0.1:5000/customers')
@@ -35,20 +37,29 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
         } else {
-            axios.post('http://127.0.0.1:5000/orders', { customer_id: customerId, product_ids: productIds, date })
-                .then(response => {
-                    console.log('Order placed:', response.data);
-                    onOrderPlaced();
-                    setCustomerId('');
-                    setProductIds([]);
-                    setDate('');
-                    setErrors({});
-                    setSuccess('Order placed successfully!');
-                })
-                .catch(error => {
-                    console.error('Error placing order:', error);
-                });
+            setShowModal(true); // Show the confirmation modal
         }
+    };
+
+    const handleConfirm = () => {
+        setShowModal(false); // Hide the modal
+        axios.post('http://127.0.0.1:5000/orders', { customer_id: customerId, product_ids: productIds, date })
+            .then(response => {
+                console.log('Order placed:', response.data);
+                onOrderPlaced();
+                setCustomerId('');
+                setProductIds([]);
+                setDate('');
+                setErrors({});
+                setSuccess('Order placed successfully!');
+            })
+            .catch(error => {
+                console.error('Error placing order:', error);
+            });
+    };
+
+    const handleCancel = () => {
+        setShowModal(false); // Hide the modal
     };
 
     return (
@@ -101,10 +112,16 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
                     </Form.Control.Feedback>
                 </Form.Group>
                 <Button variant="primary" type="submit" className="mt-3">
-                    Place Order
+                    Confirm
                 </Button>
                 {success && <Alert variant="success" className="mt-3">{success}</Alert>}
             </Form>
+            <ConfirmationModal
+                show={showModal}
+                message="Are you sure you want to place this order?"
+                onConfirm={handleConfirm}
+                onCancel={handleCancel}
+            />
         </div>
     );
 };

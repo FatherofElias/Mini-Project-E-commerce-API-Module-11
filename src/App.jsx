@@ -9,7 +9,6 @@ import AddProduct from './components/Product/AddProduct';
 import ListProducts from './components/Product/ListProducts';
 import ProductDetails from './components/Product/ProductDetails';
 import UpdateProduct from './components/Product/UpdateProduct';
-import ConfirmationModal from './components/ConfirmationModal';
 import PlaceOrderForm from './components/Order/PlaceOrderForm';
 import OrderHistory from './components/Order/OrderHistory';
 import OrderList from './components/Order/OrderList';
