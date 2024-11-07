@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
-import ConfirmationModal from './ConfirmationModal'; // Import the modal component
+import ConfirmationModal from './ConfirmationModal'; 
 
 const PlaceOrderForm = ({ onOrderPlaced }) => {
     const [customerId, setCustomerId] = useState('');
@@ -11,7 +11,7 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
     const [products, setProducts] = useState([]);
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState('');
-    const [showModal, setShowModal] = useState(false); // State to manage modal visibility
+    const [showModal, setShowModal] = useState(false); 
 
     useEffect(() => {
         axios.get('http://127.0.0.1:5000/customers')
@@ -37,12 +37,12 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
         } else {
-            setShowModal(true); // Show the confirmation modal
+            setShowModal(true); 
         }
     };
 
     const handleConfirm = () => {
-        setShowModal(false); // Hide the modal
+        setShowModal(false); 
         axios.post('http://127.0.0.1:5000/orders', { customer_id: customerId, product_ids: productIds, date })
             .then(response => {
                 console.log('Order placed:', response.data);
@@ -59,7 +59,7 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
     };
 
     const handleCancel = () => {
-        setShowModal(false); // Hide the modal
+        setShowModal(false); 
     };
 
     return (
