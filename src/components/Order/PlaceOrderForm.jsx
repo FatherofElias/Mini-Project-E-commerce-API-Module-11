@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert, Card } from 'react-bootstrap';
+import { Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
 const PlaceOrderForm = ({ onOrderPlaced }) => {
@@ -10,7 +10,6 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
     const [products, setProducts] = useState([]);
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState('');
-    const [newOrder, setNewOrder] = useState(null);
 
     useEffect(() => {
         axios.get('http://127.0.0.1:5000/customers')
@@ -40,7 +39,6 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
                 .then(response => {
                     console.log('Order placed:', response.data);
                     onOrderPlaced();
-                    setNewOrder(response.data); // Store the new order data
                     setCustomerId('');
                     setProductIds([]);
                     setDate('');
@@ -107,19 +105,6 @@ const PlaceOrderForm = ({ onOrderPlaced }) => {
                 </Button>
                 {success && <Alert variant="success" className="mt-3">{success}</Alert>}
             </Form>
-            {newOrder && (
-                <Card className="mt-4">
-                    <Card.Body>
-                        <Card.Title>New Order Details</Card.Title>
-                        <Card.Text>Order ID: {newOrder.id}</Card.Text>
-                        <Card.Text>Customer ID: {newOrder.customer_id}</Card.Text>
-                        <Card.Text>Date: {newOrder.date}</Card.Text>
-                        <Card.Text>
-                            Products: {newOrder.product_ids ? newOrder.product_ids.join(', ') : 'No products'}
-                        </Card.Text>
-                    </Card.Body>
-                </Card>
-            )}
         </div>
     );
 };
