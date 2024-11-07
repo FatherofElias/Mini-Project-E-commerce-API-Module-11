@@ -13,7 +13,7 @@ const ManageStock = () => {
     }, []);
 
     const handleRestock = (productId) => {
-        // Logic for restocking a product
+        
     };
 
     if (errors) {
